@@ -1,6 +1,11 @@
 # ReCap v1.0
 #
 import argparse
+
+from scapy.all import *
+from scapy.layers.inet import IP
+from scapy.utils import PcapWriter
+
 DEBUG = False
 if DEBUG:
     print("!!! RUNNING IN DEBUG MODE !!!")
@@ -56,6 +61,14 @@ if __name__ == '__main__':
     if DEBUG:
         print(args)
 
+    print("Reading {}...".format(args.input))
 
-    args = parser.parse_args()
+    packets = rdpcap(args.input)
+
+    print("Writing to {}...".format(args.output))
+    wrpcap(args.output, packets)
+
+    print("Job done!")
+
+    sys.exit(0)
 
