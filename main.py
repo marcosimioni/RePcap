@@ -4,6 +4,7 @@ import argparse
 
 from scapy.all import *
 from scapy.layers.inet import IP
+from scapy.layers.l2 import Ether
 from scapy.utils import PcapWriter
 
 DEBUG = False
@@ -29,6 +30,13 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
+        '-mac',
+        '--mac',
+        nargs=2,
+        help='Replace every mac_orig occurrence with mac_repl, regardless of it being src or dst.',
+    )
+
+    parser.add_argument(
         '-ip',
         '--ip',
         nargs=2,
@@ -37,8 +45,11 @@ if __name__ == '__main__':
 
     if DEBUG:
         from collections import namedtuple
-        Args = namedtuple('Args', ['input', 'output', 'ip'])
-        args = Args(input='input.pcap', output='output.pcap', ip=['192.168.1.100', '10.1.1.100'])
+        Args = namedtuple('Args', ['input', 'output', 'ip', 'mac'])
+        args = Args(input='input.pcap',
+                    output='output.pcap',
+                    ip=['192.168.1.100', '10.1.1.100'],
+                    mac=['00:11:22:33:44:55', '11:22:33:44:55:66'])
     else:
         if len(sys.argv) == 1:
             parser.print_help(sys.stderr)
@@ -69,7 +80,22 @@ if __name__ == '__main__':
         if DEBUG:
             print(p)
 
-        if 'ip' in args:
+        if 'mac' in args and args.mac:
+            # Replace source MAC, if it matches
+            if DEBUG:
+                print(p[Ether].src)
+            if p[Ether].src == args.mac[0]:
+                print("Found {} as source MAC, replacing with {}...".format(args.mac[0], args.mac[1]))
+                p[Ether].src = args.mac[1]
+
+            # Replace destination MAC, if it matches
+            if DEBUG:
+                print(p[Ether].dst)
+            if p[Ether].dst == args.mac[0]:
+                print("Found {} as destination MAC, replacing with {}...".format(args.mac[0], args.mac[1]))
+                p[Ether].dst = args.mac[1]
+
+        if 'ip' in args and args.ip:
             # Replace source IP, if it matches
             if DEBUG:
                 print(p[IP].src)
