@@ -65,6 +65,25 @@ if __name__ == '__main__':
 
     packets = rdpcap(args.input)
 
+    for p in packets:
+        if DEBUG:
+            print(p)
+
+        if 'ip' in args:
+            # Replace source IP, if it matches
+            if DEBUG:
+                print(p[IP].src)
+            if p[IP].src == args.ip[0]:
+                print("Found {} as source ip, replacing with {}...".format(args.ip[0], args.ip[1]))
+                p[IP].src = args.ip[1]
+
+            # Replace destination IP, if it matches
+            if DEBUG:
+                print(p[IP].dst)
+            if p[IP].dst == args.ip[0]:
+                print("Found {} as destination ip, replacing with {}...".format(args.ip[0], args.ip[1]))
+                p[IP].dst = args.ip[1]
+
     print("Writing to {}...".format(args.output))
     wrpcap(args.output, packets)
 
