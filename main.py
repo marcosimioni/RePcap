@@ -1,7 +1,6 @@
 # ReCap v1.0
 #
 import argparse
-import sys
 DEBUG = False
 if DEBUG:
     print("!!! RUNNING IN DEBUG MODE !!!")
